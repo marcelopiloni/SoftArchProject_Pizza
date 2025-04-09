@@ -1,0 +1,55 @@
+API-PIZZA-DELIVERY/
+├── node_modules/
+├── src/
+│   ├── config/
+│   │   ├── dbConnect.js
+│   │   └── auth.js
+│   ├── controllers/
+│   │   ├── userController.js
+│   │   ├── pizzaController.js
+│   │   ├── orderController.js
+│   │   └── deliveryController.js
+│   ├── dtos/
+│   │   ├── userDto.js
+│   │   ├── pizzaDto.js
+│   │   ├── orderDto.js
+│   │   └── deliveryDto.js
+│   ├── models/
+│   │   ├── User.js
+│   │   ├── Pizza.js
+│   │   ├── Order.js
+│   │   └── Delivery.js
+│   ├── repositories/
+│   │   ├── baseRepository.js
+│   │   ├── userRepository.js
+│   │   ├── pizzaRepository.js
+│   │   ├── orderRepository.js
+│   │   └── deliveryRepository.js
+│   ├── routes/
+│   │   ├── userRoutes.js
+│   │   ├── pizzaRoutes.js
+│   │   ├── orderRoutes.js
+│   │   ├── deliveryRoutes.js
+│   │   └── index.js
+│   ├── services/
+│   │   ├── userService.js
+│   │   ├── pizzaService.js
+│   │   ├── orderService.js
+│   │   └── deliveryService.js
+│   ├── middlewares/
+│   │   ├── authMiddleware.js
+│   │   └── validationMiddleware.js
+│   └── tests/
+│       ├── unit/
+│       │   ├── userService.test.js
+│       │   ├── pizzaService.test.js
+│       │   ├── orderService.test.js
+│       │   └── deliveryService.test.js
+│       └── integration/
+├── app.js
+├── .env
+├── .gitignore
+├── package-lock.json
+├── package.json
+├── jest.config.js
+└── server.js
