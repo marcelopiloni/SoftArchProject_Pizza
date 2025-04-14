@@ -1,13 +1,13 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 
-const router = express.Router();
+const routes = express.Router();
 
 // Rotas sem autenticação
-router.post('/', userController.register);
-router.get('/', userController.getAllUsers);
-router.get('/:id', userController.getUser);
-router.put('/:id', userController.updateUser);
-router.delete('/:id', userController.deleteUser);
+routes.post('/', userController.register);
+routes.get('/', userController.getAllUsers);
+routes.get('/:id', userController.getUser);
+routes.put('/:id', userController.updateUser);
+routes.delete('/:id', userController.deleteUser);
 
-module.exports = router;
+module.exports = routes;
