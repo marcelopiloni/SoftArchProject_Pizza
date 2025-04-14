@@ -2,8 +2,8 @@ API-PIZZA-DELIVERY/
 ├── node_modules/
 ├── src/
 │   ├── config/
-│   │   ├── dbConnect.js
-│   │   └── auth.js
+│   │   └── dbConnect.js
+│   │
 │   ├── controllers/
 │   │   └── userController.js
 │   ├── models/
