@@ -11,25 +11,6 @@ class UserController {
     }
   }
 
-  async login(req, res) {
-    try {
-      const { email, password } = req.body;
-      const result = await userService.loginUser(email, password);
-      
-      // Guardar o ID do usuário na sessão (em vez de usar JWT)
-      req.session.userId = result._id;
-      
-      res.status(200).json(result);
-    } catch (error) {
-      res.status(401).json({ message: error.message });
-    }
-  }
-  
-  async logout(req, res) {
-    req.session.destroy();
-    res.status(200).json({ message: 'Usuário desconectado com sucesso' });
-  }
-
   async getUser(req, res) {
     try {
       const { id } = req.params;
@@ -37,20 +18,6 @@ class UserController {
       res.status(200).json(user);
     } catch (error) {
       res.status(404).json({ message: error.message });
-    }
-  }
-  
-  async getCurrentUser(req, res) {
-    try {
-      const userId = req.session.userId;
-      if (!userId) {
-        return res.status(401).json({ message: 'Não autenticado' });
-      }
-      
-      const user = await userService.getUserById(userId);
-      res.status(200).json(user);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
     }
   }
 
