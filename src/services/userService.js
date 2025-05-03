@@ -1,8 +1,8 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+// const bcrypt = require('bcryptjs'); - Remover esta linha
+// const jwt = require('jsonwebtoken'); - Remover esta linha
 const userRepository = require('../repositories/userRepository');
 const userDto = require('../dtos/userDto');
-const { JWT_SECRET, JWT_EXPIRATION } = require('../config/auth');
+// const { JWT_SECRET, JWT_EXPIRATION } = require('../config/auth'); - Remover esta linha
 
 class UserService {
   async registerUser(userData) {
@@ -18,14 +18,10 @@ class UserService {
       throw new Error('Email já cadastrado');
     }
 
-    // Hash da senha
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(userData.password, salt);
-
-    // Criar o usuário com senha hash
+    // Criar o usuário sem hash de senha
     const newUser = await userRepository.create({
-      ...userData,
-      password: hashedPassword
+      ...userData
+      // Sem hash de senha
     });
 
     // Retornar usuário sem a senha
@@ -38,14 +34,13 @@ class UserService {
     if (!user) {
       throw new Error('Credenciais inválidas');
     }
-  
-    // Verificar se a senha está correta
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+
+    // Verificar senha sem bcrypt - comparação direta
+    if (user.password !== password) {
       throw new Error('Credenciais inválidas');
     }
-  
-    // Retornar apenas o usuário sem o token
+
+    // Sem geração de token JWT
     return {
       user: userDto.toResponse(user)
     };
@@ -66,13 +61,7 @@ class UserService {
       throw new Error(error.details[0].message);
     }
 
-    // Se estiver atualizando a senha, fazer o hash
-    if (userData.password) {
-      const salt = await bcrypt.genSalt(10);
-      userData.password = await bcrypt.hash(userData.password, salt);
-    }
-
-    // Atualizar usuário
+    // Atualizar usuário - sem hash de senha
     const updatedUser = await userRepository.update(userId, userData);
     if (!updatedUser) {
       throw new Error('Usuário não encontrado');
