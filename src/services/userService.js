@@ -1,67 +1,79 @@
-const userRepository = require('../repositories/userRepository');
+const userService = require('../services/userService');
 
-class UserService {
-  async registerUser(userData) {
-    const { email } = userData;
-    
-    // Verificar se o usuário já existe
-    const existingUser = await userRepository.findByEmail(email);
-    if (existingUser) {
-      throw new Error('Email já cadastrado');
+class UserController {
+  async register(req, res) {
+    try {
+      const userData = req.body;
+      const result = await userService.registerUser(userData);
+      res.status(201).json(result);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
     }
-    
-    // Criar novo usuário
-    const user = await userRepository.create(userData);
-    
-    // Retornar dados do usuário (sem senha)
-    const userResponse = user.toObject();
-    delete userResponse.password;
-    
-    return userResponse;
+  }
+
+  async login(req, res) {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: 'Email e senha são obrigatórios' });
+      }
+      
+      const result = await userService.login(email, password);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(401).json({ message: error.message });
+    }
+  }
+
+  async getUser(req, res) {
+    try {
+      const { id } = req.params;
+      const user = await userService.getUserById(id);
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(404).json({ message: error.message });
+    }
+  }
+
+  async updateUser(req, res) {
+    try {
+      const { id } = req.params;
+      const userData = req.body;
+      const updatedUser = await userService.updateUser(id, userData);
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
   }
   
-  async getUserById(userId) {
-    const user = await userRepository.getById(userId);
-    if (!user) {
-      throw new Error('Usuário não encontrado');
+  async getAllUsers(req, res) {
+    try {
+      const users = await userService.getAllUsers();
+      res.status(200).json(users);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-    
-    const userResponse = user.toObject();
-    delete userResponse.password;
-    
-    return userResponse;
   }
   
-  async updateUser(userId, userData) {
-    const user = await userRepository.update(userId, userData);
-    if (!user) {
-      throw new Error('Usuário não encontrado');
+  async deleteUser(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await userService.deleteUser(id);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(404).json({ message: error.message });
     }
-    
-    const userResponse = user.toObject();
-    delete userResponse.password;
-    
-    return userResponse;
   }
-  
-  async getAllUsers() {
-    const users = await userRepository.getAll();
-    
-    return users.map(user => {
-      const userObj = user.toObject();
-      delete userObj.password;
-      return userObj;
-    });
-  }
-  
-  async deleteUser(userId) {
-    const user = await userRepository.delete(userId);
-    if (!user) {
-      throw new Error('Usuário não encontrado');
+
+  async getProfile(req, res) {
+    try {
+      const user = await userService.getUserById(req.userId);
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(404).json({ message: error.message });
     }
-    
-    return { message: 'Usuário removido com sucesso' };
   }
 }
 
-module.exports = new UserService();
+module.exports = new UserController();
