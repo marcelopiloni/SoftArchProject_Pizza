@@ -1,20 +1,20 @@
 const express = require('express');
 const userController = require('../controllers/userController');
-const { authMiddleware, adminMiddleware } = require('../middlewares/authMiddleware');
+// Remova esta linha: const { authMiddleware, adminMiddleware } = require('../middlewares/authMiddleware');
 
 const routes = express.Router();
 
-// Rotas públicas (sem autenticação)
+// Rotas sem autenticação
 routes.post('/register', userController.register);
 routes.post('/login', userController.login);
 
-// Rotas protegidas (com autenticação)
-routes.get('/profile', authMiddleware, userController.getProfile);
-routes.get('/:id', authMiddleware, userController.getUser);
-routes.put('/:id', authMiddleware, userController.updateUser);
+// Remova os middlewares authMiddleware
+routes.get('/profile', userController.getProfile);
+routes.get('/:id', userController.getUser);
+routes.put('/:id', userController.updateUser);
 
-// Rotas de admin
-routes.get('/', authMiddleware, adminMiddleware, userController.getAllUsers);
-routes.delete('/:id', authMiddleware, adminMiddleware, userController.deleteUser);
+// Remova os middlewares adminMiddleware
+routes.get('/', userController.getAllUsers);
+routes.delete('/:id', userController.deleteUser);
 
 module.exports = routes;

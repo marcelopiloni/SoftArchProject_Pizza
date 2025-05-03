@@ -1,16 +1,17 @@
 const express = require('express');
 const deliveryController = require('../controllers/deliveryController');
-const { authMiddleware, adminMiddleware } = require('../middlewares/authMiddleware');
+// Remova esta linha:
+// const { authMiddleware, adminMiddleware } = require('../middlewares/authMiddleware');
 
 const routes = express.Router();
 
-// Rotas de Entregas
-routes.post('/', authMiddleware, adminMiddleware, deliveryController.createDelivery);
-routes.get('/', authMiddleware, deliveryController.getAllDeliveries);
-routes.get('/:id', authMiddleware, deliveryController.getDelivery);
-routes.get('/order/:orderId', authMiddleware, deliveryController.getDeliveryByOrder);
-routes.put('/:id', authMiddleware, adminMiddleware, deliveryController.updateDelivery);
-routes.patch('/:id/status', authMiddleware, adminMiddleware, deliveryController.updateDeliveryStatus);
-routes.delete('/:id', authMiddleware, adminMiddleware, deliveryController.deleteDelivery);
+// Rotas de Entregas - remover middlewares
+routes.post('/', deliveryController.createDelivery);
+routes.get('/', deliveryController.getAllDeliveries);
+routes.get('/:id', deliveryController.getDelivery);
+routes.get('/order/:orderId', deliveryController.getDeliveryByOrder);
+routes.put('/:id', deliveryController.updateDelivery);
+routes.patch('/:id/status', deliveryController.updateDeliveryStatus);
+routes.delete('/:id', deliveryController.deleteDelivery);
 
 module.exports = routes;

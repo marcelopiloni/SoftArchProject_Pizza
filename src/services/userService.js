@@ -1,79 +1,97 @@
-const userService = require('../services/userService');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const userRepository = require('../repositories/userRepository');
+const userDto = require('../dtos/userDto');
+const { JWT_SECRET, JWT_EXPIRATION } = require('../config/auth');
 
-class UserController {
-  async register(req, res) {
-    try {
-      const userData = req.body;
-      const result = await userService.registerUser(userData);
-      res.status(201).json(result);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
+class UserService {
+  async registerUser(userData) {
+    // Validar dados do usuário
+    const { error } = userDto.validateCreate(userData);
+    if (error) {
+      throw new Error(error.details[0].message);
     }
+
+    // Verificar se o e-mail já está em uso
+    const existingUser = await userRepository.findByEmail(userData.email);
+    if (existingUser) {
+      throw new Error('Email já cadastrado');
+    }
+
+    // Hash da senha
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(userData.password, salt);
+
+    // Criar o usuário com senha hash
+    const newUser = await userRepository.create({
+      ...userData,
+      password: hashedPassword
+    });
+
+    // Retornar usuário sem a senha
+    return userDto.toResponse(newUser);
   }
 
-  async login(req, res) {
-    try {
-      const { email, password } = req.body;
-      
-      if (!email || !password) {
-        return res.status(400).json({ message: 'Email e senha são obrigatórios' });
-      }
-      
-      const result = await userService.login(email, password);
-      res.status(200).json(result);
-    } catch (error) {
-      res.status(401).json({ message: error.message });
+  async login(email, password) {
+    // Verificar se o usuário existe
+    const user = await userRepository.findByEmail(email);
+    if (!user) {
+      throw new Error('Credenciais inválidas');
     }
-  }
-
-  async getUser(req, res) {
-    try {
-      const { id } = req.params;
-      const user = await userService.getUserById(id);
-      res.status(200).json(user);
-    } catch (error) {
-      res.status(404).json({ message: error.message });
-    }
-  }
-
-  async updateUser(req, res) {
-    try {
-      const { id } = req.params;
-      const userData = req.body;
-      const updatedUser = await userService.updateUser(id, userData);
-      res.status(200).json(updatedUser);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
-  }
   
-  async getAllUsers(req, res) {
-    try {
-      const users = await userService.getAllUsers();
-      res.status(200).json(users);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+    // Verificar se a senha está correta
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('Credenciais inválidas');
     }
-  }
   
-  async deleteUser(req, res) {
-    try {
-      const { id } = req.params;
-      const result = await userService.deleteUser(id);
-      res.status(200).json(result);
-    } catch (error) {
-      res.status(404).json({ message: error.message });
-    }
+    // Retornar apenas o usuário sem o token
+    return {
+      user: userDto.toResponse(user)
+    };
   }
 
-  async getProfile(req, res) {
-    try {
-      const user = await userService.getUserById(req.userId);
-      res.status(200).json(user);
-    } catch (error) {
-      res.status(404).json({ message: error.message });
+  async getUserById(userId) {
+    const user = await userRepository.getById(userId);
+    if (!user) {
+      throw new Error('Usuário não encontrado');
     }
+    return userDto.toResponse(user);
+  }
+
+  async updateUser(userId, userData) {
+    // Validar dados de atualização
+    const { error } = userDto.validateUpdate(userData);
+    if (error) {
+      throw new Error(error.details[0].message);
+    }
+
+    // Se estiver atualizando a senha, fazer o hash
+    if (userData.password) {
+      const salt = await bcrypt.genSalt(10);
+      userData.password = await bcrypt.hash(userData.password, salt);
+    }
+
+    // Atualizar usuário
+    const updatedUser = await userRepository.update(userId, userData);
+    if (!updatedUser) {
+      throw new Error('Usuário não encontrado');
+    }
+    return userDto.toResponse(updatedUser);
+  }
+
+  async getAllUsers() {
+    const users = await userRepository.getAll();
+    return users.map(user => userDto.toResponse(user));
+  }
+
+  async deleteUser(userId) {
+    const deletedUser = await userRepository.delete(userId);
+    if (!deletedUser) {
+      throw new Error('Usuário não encontrado');
+    }
+    return { message: 'Usuário removido com sucesso' };
   }
 }
 
-module.exports = new UserController();
+module.exports = new UserService();
