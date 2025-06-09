@@ -1,20 +1,24 @@
 const express = require('express');
-const userController = require('../controllers/userController');
-// Remova esta linha: const { authMiddleware, adminMiddleware } = require('../middlewares/authMiddleware');
+const userController = require('../controllers/userController.js');
+const { authMiddleware, adminMiddleware, optionalAuthMiddleware } = require('../middlewares/authMiddleware.js');
+const validationMiddleware = require('../middlewares/validationMiddleware.js');
+const userDto = require('../dtos/userDto.js');
 
 const routes = express.Router();
 
-// Rotas sem autenticação
-routes.post('/register', userController.register);
+// Rotas públicas
+routes.post('/register', validationMiddleware(userDto.validateCreate), userController.register);
 routes.post('/login', userController.login);
 
-// Remova os middlewares authMiddleware
-routes.get('/profile', userController.getProfile);
-routes.get('/:id', userController.getUser);
-routes.put('/:id', userController.updateUser);
+// Rotas com autenticação opcional (pode funcionar com ou sem token)
+routes.get('/profile', optionalAuthMiddleware, userController.getProfile);
 
-// Remova os middlewares adminMiddleware
-routes.get('/', userController.getAllUsers);
-routes.delete('/:id', userController.deleteUser);
+// Rotas protegidas - requer autenticação
+routes.get('/:id', authMiddleware, userController.getUser);
+routes.put('/:id', authMiddleware, validationMiddleware(userDto.validateUpdate), userController.updateUser);
+
+// Rotas de admin - requer autenticação e role admin
+routes.get('/', authMiddleware, adminMiddleware, userController.getAllUsers);
+routes.delete('/:id', authMiddleware, adminMiddleware, userController.deleteUser);
 
 module.exports = routes;
