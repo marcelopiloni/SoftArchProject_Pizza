@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍕 Pizzaria Delivery</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/auth.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-pizza-slice"></i>
+                <span>Pizzaria Delivery</span>
+            </div>
+            <nav class="nav-buttons" id="navButtons">
+                <!-- Navegação será inserida dinamicamente -->
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Loading -->
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Carregando...</p>
+            </div>
+
+            <!-- Auth Section -->
+            <section id="authSection" class="auth-section">
+                <div class="auth-container">
+                    <!-- Login Form -->
+                    <div id="loginForm" class="auth-form">
+                        <div class="auth-header">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <h2>Entrar</h2>
+                        </div>
+                        <form id="loginFormElement">
+                            <div class="form-group">
+                                <label for="loginEmail">Email:</label>
+                                <input type="email" id="loginEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword">Senha:</label>
+                                <input type="password" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Entrar
+                            </button>
+                        </form>
+                        <p class="auth-switch">
+                            Não tem conta? 
+                            <a href="#" onclick="showRegister()">Cadastre-se</a>
+                        </p>
+                    </div>
+
+                    <!-- Register Form -->
+                    <div id="registerForm" class="auth-form hidden">
+                        <div class="auth-header">
+                            <i class="fas fa-user-plus"></i>
+                            <h2>Cadastrar</h2>
+                        </div>
+                        <form id="registerFormElement">
+                            <div class="form-group">
+                                <label for="registerName">Nome:</label>
+                                <input type="text" id="registerName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerEmail">Email:</label>
+                                <input type="email" id="registerEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerPhone">Telefone:</label>
+                                <input type="tel" id="registerPhone" required placeholder="11999888777">
+                            </div>
+                            <div class="form-group">
+                                <label for="registerPassword">Senha:</label>
+                                <input type="password" id="registerPassword" required minlength="6">
+                            </div>
+                            <div class="form-group">
+                                <label for="registerRole">Tipo de usuário:</label>
+                                <select id="registerRole">
+                                    <option value="user">Cliente</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block">
+                                <i class="fas fa-user-plus"></i>
+                                Cadastrar
+                            </button>
+                        </form>
+                        <p class="auth-switch">
+                            Já tem conta? 
+                            <a href="#" onclick="showLogin()">Faça login</a>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- App Content (after login) -->
+            <section id="appContent" class="app-content hidden">
+                <!-- Dashboard -->
+                <div id="dashboard" class="section">
+                    <div class="dashboard-header">
+                        <h1>Dashboard</h1>
+                        <p>Bem-vindo ao sistema de pizzaria!</p>
+                    </div>
+                    <div class="dashboard-cards">
+                        <div class="dashboard-card" onclick="showSection('pizzas')">
+                            <i class="fas fa-pizza-slice"></i>
+                            <h3>Pizzas</h3>
+                            <p>Gerenciar cardápio</p>
+                        </div>
+                        <div class="dashboard-card" onclick="showSection('orders')">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h3>Pedidos</h3>
+                            <p>Visualizar pedidos</p>
+                        </div>
+                        <div class="dashboard-card" onclick="showSection('deliveries')">
+                            <i class="fas fa-truck"></i>
+                            <h3>Entregas</h3>
+                            <p>Gerenciar entregas</p>
+                        </div>
+                        <div class="dashboard-card" onclick="showSection('users')" id="usersCard">
+                            <i class="fas fa-users"></i>
+                            <h3>Usuários</h3>
+                            <p>Gerenciar usuários</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pizzas Section -->
+                <div id="pizzas" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-pizza-slice"></i> Pizzas</h2>
+                        <button class="btn btn-primary" onclick="showPizzaModal()" id="addPizzaBtn">
+                            <i class="fas fa-plus"></i> Adicionar Pizza
+                        </button>
+                    </div>
+                    <div class="filters">
+                        <select id="categoryFilter" onchange="filterPizzas()">
+                            <option value="">Todas as categorias</option>
+                            <option value="Tradicional">Tradicional</option>
+                            <option value="Premium">Premium</option>
+                            <option value="Doce">Doce</option>
+                        </select>
+                    </div>
+                    <div id="pizzasList" class="items-grid">
+                        <!-- Pizzas serão carregadas aqui -->
+                    </div>
+                </div>
+
+                <!-- Orders Section -->
+                <div id="orders" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-shopping-cart"></i> Pedidos</h2>
+                        <button class="btn btn-primary" onclick="showOrderModal()">
+                            <i class="fas fa-plus"></i> Novo Pedido
+                        </button>
+                    </div>
+                    <div class="filters">
+                        <select id="statusFilter" onchange="filterOrders()">
+                            <option value="">Todos os status</option>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Em preparo">Em preparo</option>
+                            <option value="Em entrega">Em entrega</option>
+                            <option value="Entregue">Entregue</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                    <div id="ordersList" class="items-list">
+                        <!-- Pedidos serão carregados aqui -->
+                    </div>
+                </div>
+
+                <!-- Deliveries Section -->
+                <div id="deliveries" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-truck"></i> Entregas</h2>
+                        <button class="btn btn-primary" onclick="showDeliveryModal()" id="addDeliveryBtn">
+                            <i class="fas fa-plus"></i> Nova Entrega
+                        </button>
+                    </div>
+                    <div id="deliveriesList" class="items-list">
+                        <!-- Entregas serão carregadas aqui -->
+                    </div>
+                </div>
+
+                <!-- Users Section -->
+                <div id="users" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-users"></i> Usuários</h2>
+                    </div>
+                    <div id="usersList" class="items-list">
+                        <!-- Usuários serão carregados aqui -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="modalOverlay" class="modal-overlay hidden"></div>
+    
+    <!-- Pizza Modal -->
+    <div id="pizzaModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="pizzaModalTitle">Adicionar Pizza</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="pizzaModalForm">
+                <div class="form-group">
+                    <label for="pizzaName">Nome:</label>
+                    <input type="text" id="pizzaName" required>
+                </div>
+                <div class="form-group">
+                    <label for="pizzaIngredients">Ingredientes:</label>
+                    <textarea id="pizzaIngredients" placeholder="Separar por vírgula" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="pizzaPrice">Preço:</label>
+                    <input type="number" id="pizzaPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="pizzaCategory">Categoria:</label>
+                    <select id="pizzaCategory" required>
+                        <option value="">Selecione</option>
+                        <option value="Tradicional">Tradicional</option>
+                        <option value="Premium">Premium</option>
+                        <option value="Doce">Doce</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div id="orderModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Novo Pedido</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="orderModalForm">
+                <div class="form-group">
+                    <label>Pizzas:</label>
+                    <div id="orderPizzasList">
+                        <!-- Lista de pizzas será carregada aqui -->
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderStreet">Rua:</label>
+                        <input type="text" id="orderStreet" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderNumber">Número:</label>
+                        <input type="text" id="orderNumber" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderComplement">Complemento:</label>
+                        <input type="text" id="orderComplement">
+                    </div>
+                    <div class="form-group">
+                        <label for="orderNeighborhood">Bairro:</label>
+                        <input type="text" id="orderNeighborhood" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderCity">Cidade:</label>
+                        <input type="text" id="orderCity" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderZipCode">CEP:</label>
+                        <input type="text" id="orderZipCode" pattern="[0-9]{8}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="orderPayment">Forma de Pagamento:</label>
+                    <select id="orderPayment" required>
+                        <option value="">Selecione</option>
+                        <option value="Dinheiro">Dinheiro</option>
+                        <option value="Cartão de crédito">Cartão de crédito</option>
+                        <option value="Cartão de débito">Cartão de débito</option>
+                        <option value="PIX">PIX</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="orderObservations">Observações:</label>
+                    <textarea id="orderObservations"></textarea>
+                </div>
+                <div class="order-total">
+                    <strong>Total: R$ <span id="orderTotal">0.00</span></strong>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Fazer Pedido</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delivery Modal -->
+    <div id="deliveryModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nova Entrega</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="deliveryModalForm">
+                <div class="form-group">
+                    <label for="deliveryOrder">Pedido:</label>
+                    <select id="deliveryOrder" required>
+                        <option value="">Selecione um pedido</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryPerson">Entregador:</label>
+                    <input type="text" id="deliveryPerson" required>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryTime">Tempo Estimado (minutos):</label>
+                    <input type="number" id="deliveryTime" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="deliveryNotes">Observações:</label>
+                    <textarea id="deliveryNotes"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar Entrega</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+        <div class="notification-content">
+            <span id="notificationMessage"></span>
+        </div>
+    </div>
+
+    <!-- Scripts - ORDEM CORRIGIDA -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/pizzas.js"></script>
+    <script src="js/orders.js"></script>
+    <script src="js/deliveries.js"></script>
+    <script src="js/users.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

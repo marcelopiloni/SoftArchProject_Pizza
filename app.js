@@ -1,12 +1,12 @@
 const express = require('express');
-// const cors = require('cors'); // Comentado temporariamente
+const path = require('path');
 const routes = require('./src/routes/index');
 const connectToDatabase = require('./src/config/dbConnect');
 require('dotenv').config();
 
 const app = express();
 
-// Middleware CORS simples (sem biblioteca externa)
+// Middleware CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
@@ -30,6 +30,9 @@ connectToDatabase()
     process.exit(1);
   });
 
+// Servir arquivos estáticos do frontend
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).json({ 
@@ -42,24 +45,19 @@ app.get('/health', (req, res) => {
 // Rotas da API
 app.use('/api', routes);
 
-// Middleware para rotas não encontradas
-app.use('*', (req, res) => {
-  res.status(404).json({ 
-    message: 'Rota não encontrada',
-    availableRoutes: [
-      'GET /health',
-      'POST /api/users/register',
-      'POST /api/users/login',
-      'GET /api/pizzas',
-      'GET /api/orders',
-      'GET /api/deliveries'
-    ]
-  });
+// Rota para servir o frontend (SPA)
+app.get('*', (req, res) => {
+  // Se a rota não começar com /api, servir o index.html
+  if (!req.url.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  } else {
+    res.status(404).json({ message: 'Rota da API não encontrada' });
+  }
 });
 
 // Middleware de tratamento de erros
 app.use((err, req, res, next) => {
-  console.error('🔥 Erro capturado:', err.stack);
+  console.error('Erro capturado:', err.stack);
   
   if (err.name === 'ValidationError') {
     return res.status(400).json({ message: err.message });
