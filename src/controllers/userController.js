@@ -1,4 +1,4 @@
-const userService = require('../services/userService');
+const userService = require('../services/userService.js');
 
 class UserController {
   async register(req, res) {
@@ -11,20 +11,20 @@ class UserController {
     }
   }
 
-async login(req, res) {
-  try {
-    const { email, password } = req.body;
-    
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email e senha são obrigatórios' });
+  async login(req, res) {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: 'Email e senha são obrigatórios' });
+      }
+      
+      const result = await userService.login(email, password);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(401).json({ message: error.message });
     }
-    
-    const result = await userService.login(email, password);
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(401).json({ message: error.message });
   }
-}
 
   async getUser(req, res) {
     try {
@@ -38,17 +38,30 @@ async login(req, res) {
 
   async getProfile(req, res) {
     try {
-      const userId = req.query.userId; // Adicione ?userId=123 na URL
+      // Se tiver token, usar o userId do token, senão usar query param
+      const userId = req.user?.userId || req.query.userId;
+      
+      if (!userId) {
+        return res.status(400).json({ message: 'ID do usuário é obrigatório' });
+      }
+      
       const user = await userService.getUserById(userId);
       res.status(200).json(user);
     } catch (error) {
       res.status(404).json({ message: error.message });
     }
   }
+
   async updateUser(req, res) {
     try {
       const { id } = req.params;
       const userData = req.body;
+      
+      // Verificar se o usuário pode atualizar (próprio perfil ou admin)
+      if (req.user && req.user.userId !== id && req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Acesso negado' });
+      }
+      
       const updatedUser = await userService.updateUser(id, userData);
       res.status(200).json(updatedUser);
     } catch (error) {

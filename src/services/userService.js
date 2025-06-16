@@ -1,8 +1,8 @@
-// const bcrypt = require('bcryptjs'); - Remover esta linha
-// const jwt = require('jsonwebtoken'); - Remover esta linha
-const userRepository = require('../repositories/userRepository');
-const userDto = require('../dtos/userDto');
-// const { JWT_SECRET, JWT_EXPIRATION } = require('../config/auth'); - Remover esta linha
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const userRepository = require('../repositories/userRepository.js');
+const userDto = require('../dtos/userDto.js');
+const { JWT_SECRET, JWT_EXPIRATION } = require('../config/auth.js');
 
 class UserService {
   async registerUser(userData) {
@@ -18,14 +18,31 @@ class UserService {
       throw new Error('Email já cadastrado');
     }
 
-    // Criar o usuário sem hash de senha
+    // Criptografar a senha
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+
+    // Criar o usuário com senha criptografada
     const newUser = await userRepository.create({
-      ...userData
-      // Sem hash de senha
+      ...userData,
+      password: hashedPassword
     });
 
-    // Retornar usuário sem a senha
-    return userDto.toResponse(newUser);
+    // Gerar token JWT
+    const token = jwt.sign(
+      { 
+        userId: newUser._id, 
+        email: newUser.email, 
+        role: newUser.role 
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRATION }
+    );
+
+    return {
+      user: userDto.toResponse(newUser),
+      token
+    };
   }
 
   async login(email, password) {
@@ -35,14 +52,26 @@ class UserService {
       throw new Error('Credenciais inválidas');
     }
 
-    // Verificar senha sem bcrypt - comparação direta
-    if (user.password !== password) {
+    // Verificar senha
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
       throw new Error('Credenciais inválidas');
     }
 
-    // Sem geração de token JWT
+    // Gerar token JWT
+    const token = jwt.sign(
+      { 
+        userId: user._id, 
+        email: user.email, 
+        role: user.role 
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRATION }
+    );
+
     return {
-      user: userDto.toResponse(user)
+      user: userDto.toResponse(user),
+      token
     };
   }
 
@@ -61,7 +90,20 @@ class UserService {
       throw new Error(error.details[0].message);
     }
 
-    // Atualizar usuário - sem hash de senha
+    // Se está atualizando senha, criptografar
+    if (userData.password) {
+      const saltRounds = 12;
+      userData.password = await bcrypt.hash(userData.password, saltRounds);
+    }
+
+    // Verificar se email já existe (se estiver sendo atualizado)
+    if (userData.email) {
+      const existingUser = await userRepository.findByEmail(userData.email);
+      if (existingUser && existingUser._id.toString() !== userId) {
+        throw new Error('Email já está em uso');
+      }
+    }
+
     const updatedUser = await userRepository.update(userId, userData);
     if (!updatedUser) {
       throw new Error('Usuário não encontrado');

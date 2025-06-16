@@ -1,0 +1,448 @@
+/* ==========================================
+   COMPONENTS STYLES - MODALS, NOTIFICATIONS, ETC
+   ========================================== */
+
+/* ==========================================
+   MODAL STYLES
+   ========================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2001;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-content {
+    background: #FAFAFA;
+    border-radius: 16px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+    border: 2px solid #E74C3C;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.modal-header {
+    padding: 25px 30px 20px;
+    border-bottom: 2px solid #ecf0f1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    color: #E74C3C;
+    font-size: 1.5em;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2em;
+    color: #7F8C8D;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: #E74C3C;
+    color: #FAFAFA;
+    transform: rotate(90deg);
+}
+
+.modal form {
+    padding: 30px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #ecf0f1;
+}
+
+/* ==========================================
+   NOTIFICATION STYLES
+   ========================================== */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 3000;
+    min-width: 300px;
+    max-width: 500px;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.notification-content {
+    padding: 15px 20px;
+    border-radius: 10px;
+    color: #FAFAFA;
+    font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification.success .notification-content {
+    background: #27AE60;
+    border-left: 4px solid #229954;
+}
+
+.notification.error .notification-content {
+    background: #E74C3C;
+    border-left: 4px solid #c0392b;
+}
+
+.notification.warning .notification-content {
+    background: #F4D03F;
+    color: #2c3e50;
+    border-left: 4px solid #f1c40f;
+}
+
+.notification.info .notification-content {
+    background: #7F8C8D;
+    border-left: 4px solid #6c7b7d;
+}
+
+/* ==========================================
+   STATUS BADGES
+   ========================================== */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.pendente {
+    background: #F4D03F;
+    color: #2c3e50;
+}
+
+.status-badge.em-preparo {
+    background: #E74C3C;
+    color: #FAFAFA;
+}
+
+.status-badge.em-entrega,
+.status-badge.em-rota {
+    background: #7F8C8D;
+    color: #FAFAFA;
+}
+
+.status-badge.entregue {
+    background: #27AE60;
+    color: #FAFAFA;
+}
+
+.status-badge.cancelado {
+    background: #34495e;
+    color: #FAFAFA;
+}
+
+/* ==========================================
+   PIZZA CARD STYLES
+   ========================================== */
+.pizza-card {
+    background: #FAFAFA;
+    border: 2px solid #ecf0f1;
+    border-radius: 16px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.pizza-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(231, 76, 60, 0.2);
+    border-color: #E74C3C;
+}
+
+.pizza-card::before {
+    content: '🍕';
+    font-size: 4em;
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    opacity: 0.1;
+    transform: rotate(15deg);
+}
+
+.pizza-category {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #E74C3C;
+    color: #FAFAFA;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.pizza-name {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.pizza-ingredients {
+    color: #7F8C8D;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.pizza-price {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #E74C3C;
+    margin-bottom: 15px;
+}
+
+/* ==========================================
+   ORDER CARD STYLES
+   ========================================== */
+.order-card {
+    background: #FAFAFA;
+    border: 1px solid #ecf0f1;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    border-left: 5px solid #E74C3C;
+}
+
+.order-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transform: translateX(5px);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.order-id {
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 1.1em;
+}
+
+.order-date {
+    color: #7F8C8D;
+    font-size: 0.9em;
+}
+
+.order-total {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #E74C3C;
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 8px;
+}
+
+.order-pizzas {
+    margin-bottom: 20px;
+}
+
+.order-pizza-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.order-pizza-item:last-child {
+    border-bottom: none;
+}
+
+.order-address {
+    background: rgba(244, 208, 63, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    color: #2c3e50;
+}
+
+/* ==========================================
+   ORDER MODAL SPECIFIC
+   ========================================== */
+.order-pizza-selector {
+    border: 1px solid #ecf0f1;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: rgba(250, 250, 250, 0.5);
+}
+
+.order-pizza-selector.selected {
+    border-color: #E74C3C;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.pizza-selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #E74C3C;
+    background: #FAFAFA;
+    color: #E74C3C;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background: #E74C3C;
+    color: #FAFAFA;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid #ecf0f1;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+/* ==========================================
+   RESPONSIVE MODAL
+   ========================================== */
+@media (max-width: 768px) {
+    .modal {
+        max-width: 95%;
+        margin: 0 10px;
+    }
+    
+    .modal-header {
+        padding: 20px 25px 15px;
+    }
+    
+    .modal form {
+        padding: 25px;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-actions .btn {
+        width: 100%;
+    }
+    
+    .notification {
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-header {
+        padding: 15px 20px 10px;
+    }
+    
+    .modal form {
+        padding: 20px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.3em;
+    }
+    
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .pizza-selector-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

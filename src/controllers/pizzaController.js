@@ -1,4 +1,4 @@
-const pizzaService = require('../services/pizzaService');
+const pizzaService = require('../services/pizzaService.js');
 
 class PizzaController {
   async createPizza(req, res) {
@@ -34,7 +34,15 @@ class PizzaController {
 
   async getAllPizzas(req, res) {
     try {
-      const pizzas = await pizzaService.getAllPizzas();
+      const { category } = req.query;
+      
+      let pizzas;
+      if (category) {
+        pizzas = await pizzaService.getPizzasByCategory(category);
+      } else {
+        pizzas = await pizzaService.getAllPizzas();
+      }
+      
       res.status(200).json(pizzas);
     } catch (error) {
       res.status(500).json({ message: error.message });
