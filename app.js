@@ -1,13 +1,17 @@
 const express = require('express');
-const { specs, swaggerUi, swaggerOptions } = require('./src/config/swagger');
 const path = require('path');
 const routes = require('./src/routes/index');
 const connectToDatabase = require('./src/config/dbConnect');
+const { specs, swaggerUi, swaggerOptions } = require('./src/config/swagger');
+
+// ✨ NOVA IMPORTAÇÃO
+const { initializeApp } = require('./src/utils/setupAdmin');
+
 require('dotenv').config();
 
 const app = express();
 
-// Middleware CORS
+// Middleware CORS (manter o existente)
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
@@ -19,41 +23,48 @@ app.use((req, res, next) => {
   }
 });
 
-//Rota Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerOptions));
-
-
-// Middleware para parse de JSON
+// Middleware para parse de JSON (manter o existente)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Conectar ao banco de dados
+// ✨ CONECTAR AO BANCO E INICIALIZAR ADMIN
 connectToDatabase()
-  .then(() => console.log('✅ Banco de dados conectado com sucesso'))
+  .then(async () => {
+    console.log('✅ Banco de dados conectado com sucesso');
+    
+    // ✨ CHAMAR INICIALIZAÇÃO AUTOMÁTICA (SÓ ADMIN)
+    await initializeApp();
+  })
   .catch(err => {
     console.error('❌ Erro na conexão com o banco de dados:', err);
     process.exit(1);
   });
 
-// Servir arquivos estáticos do frontend
+// Servir arquivos estáticos do frontend (manter o existente)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Health Check
+// Swagger Documentation (manter o existente)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerOptions));
+
+// Health check (manter o existente)
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     message: 'API Pizza Delivery funcionando!',
     timestamp: new Date().toISOString(),
-    documentation: 'http://localhost:3000/api-docs' // ✨ NOVO
+    documentation: 'http://localhost:3000/api-docs',
+    adminCredentials: {
+      email: 'admin@pizzaria.com',
+      password: 'admin123'
+    }
   });
 });
 
-// Rotas da API
+// Rotas da API (manter o existente)
 app.use('/api', routes);
 
-// Rota para servir o frontend (SPA)
+// Rota para servir o frontend (manter o existente)
 app.get('*', (req, res) => {
-  // Se a rota não começar com /api, servir o index.html
   if (!req.url.startsWith('/api')) {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
   } else {
@@ -61,7 +72,7 @@ app.get('*', (req, res) => {
   }
 });
 
-// Middleware de tratamento de erros
+// Middleware de tratamento de erros (manter o existente)
 app.use((err, req, res, next) => {
   console.error('Erro capturado:', err.stack);
   
