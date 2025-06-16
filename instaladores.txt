@@ -1,2 +1,1 @@
-npm install express mongoose bcrypt dotenv
-npm install --save-dev nodemon
+npm install express mongoose bcryptjs jsonwebtoken joi cors dotenv swagger-jsdoc swagger-ui-express && npm install --save-dev nodemon jest supertest
